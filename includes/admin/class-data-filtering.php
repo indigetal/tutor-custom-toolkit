@@ -23,7 +23,11 @@ class Data_Filtering {
      */
     public static function filter_withdraw_requests( $query ) {
         if ( is_admin() && $query->is_main_query() && isset( $_GET['page'] ) && $_GET['page'] === 'tutor_withdraw_requests' ) {
-            if ( current_user_can( 'view_withdraw_requests' ) && ! current_user_can( 'manage_tutor' ) ) {
+            if ( current_user_can( 'manage_tutor' ) ) {
+                return; // Skip filtering for administrators.
+            }
+
+            if ( current_user_can( 'view_withdraw_requests' ) ) {
                 $query->set( 'meta_key', 'instructor_id' );
                 $query->set( 'meta_value', get_current_user_id() );
             }
@@ -37,7 +41,11 @@ class Data_Filtering {
      */
     public static function filter_orders( $query ) {
         if ( is_admin() && $query->is_main_query() && isset( $_GET['page'] ) && $_GET['page'] === 'tutor_orders' ) {
-            if ( current_user_can( 'manage_orders' ) && ! current_user_can( 'manage_tutor' ) ) {
+            if ( current_user_can( 'manage_tutor' ) ) {
+                return; // Skip filtering for administrators.
+            }
+
+            if ( current_user_can( 'manage_orders' ) ) {
                 $query->set( 'meta_key', 'customer_id' );
                 $query->set( 'meta_value', get_current_user_id() );
             }
@@ -51,7 +59,11 @@ class Data_Filtering {
      */
     public static function filter_subscriptions( $query ) {
         if ( is_admin() && $query->is_main_query() && isset( $_GET['page'] ) && $_GET['page'] === 'tutor_subscriptions' ) {
-            if ( current_user_can( 'view_subscriptions' ) && ! current_user_can( 'manage_tutor' ) ) {
+            if ( current_user_can( 'manage_tutor' ) ) {
+                return; // Skip filtering for administrators.
+            }
+
+            if ( current_user_can( 'view_subscriptions' ) ) {
                 $query->set( 'meta_key', 'subscriber_id' );
                 $query->set( 'meta_value', get_current_user_id() );
             }

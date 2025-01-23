@@ -39,6 +39,9 @@ class Subscriptions_Handler {
      * Display a notice for the Subscriptions page.
      */
     public static function add_subscriptions_notice() {
+        if ( current_user_can( 'manage_tutor' ) ) {
+            return; // Skip the notice for administrators.
+        }
         echo '<div class="notice notice-info"><p>' . esc_html__( 'Displaying only your associated subscriptions.', 'tutor' ) . '</p></div>';
     }
 
@@ -49,7 +52,11 @@ class Subscriptions_Handler {
      * @return array The modified query arguments.
      */
     public static function filter_subscriptions_query( $query_args ) {
-        if ( current_user_can( 'view_subscriptions' ) && ! current_user_can( 'manage_tutor' ) ) {
+        if ( current_user_can( 'manage_tutor' ) ) {
+            return $query_args; // Skip filtering for administrators.
+        }
+
+        if ( current_user_can( 'view_subscriptions' ) ) {
             $query_args['meta_query'] = [
                 [
                     'key'     => 'subscriber_id',

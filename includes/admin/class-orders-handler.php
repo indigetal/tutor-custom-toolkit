@@ -39,6 +39,9 @@ class Orders_Handler {
      * Display a notice for the Orders page.
      */
     public static function add_orders_notice() {
+        if ( current_user_can( 'manage_tutor' ) ) {
+            return; // Skip the notice for administrators.
+        }
         echo '<div class="notice notice-info"><p>' . esc_html__( 'Displaying only your associated orders.', 'tutor' ) . '</p></div>';
     }
 
@@ -49,7 +52,11 @@ class Orders_Handler {
      * @return array The modified query arguments.
      */
     public static function filter_orders_query( $query_args ) {
-        if ( current_user_can( 'manage_orders' ) && ! current_user_can( 'manage_tutor' ) ) {
+        if ( current_user_can( 'manage_tutor' ) ) {
+            return $query_args; // Skip filtering for administrators.
+        }
+
+        if ( current_user_can( 'manage_orders' ) ) {
             $query_args['meta_query'] = [
                 [
                     'key'     => 'customer_id',

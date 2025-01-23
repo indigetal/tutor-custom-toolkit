@@ -12,10 +12,10 @@ class Capabilities_Manager {
      */
     public static function init() {
         // Add new capabilities during plugin activation.
-        register_activation_hook( __FILE__, [ __CLASS__, 'add_capabilities' ] );
+        register_activation_hook( TUTOR_CUSTOM_TOOLKIT_FILE, [ __CLASS__, 'add_capabilities' ] );
 
         // Remove capabilities on deactivation (optional).
-        register_deactivation_hook( __FILE__, [ __CLASS__, 'remove_capabilities' ] );
+        register_deactivation_hook( TUTOR_CUSTOM_TOOLKIT_FILE, [ __CLASS__, 'remove_capabilities' ] );
     }
 
     /**

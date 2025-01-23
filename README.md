@@ -13,7 +13,10 @@ A powerful integration tool for Tutor LMS that extends its functionality by enab
 
 2. **Dynamic Data Filtering:**
 
-   - Filters data displayed on backend pages like Withdraw Requests, Orders, and Subscriptions to ensure instructors only see their associated data.
+   - Filters data displayed on backend pages to ensure instructors only see data related to their own courses:
+     - **Withdraw Requests:** Displays only withdraw requests from students in the instructor’s courses.
+     - **Orders:** Shows only orders for the instructor’s courses.
+     - **Subscriptions:** Lists only subscriptions tied to the instructor’s courses.
 
 3. **Dynamic Template Override:**
 
@@ -46,7 +49,7 @@ This plugin is ideal if:
 
 2. **Dynamic Data Filtering:**
 
-   - Ensures that instructors only see data relevant to them on backend pages.
+   - Ensures that instructors only see data related to their own courses on backend pages.
 
 3. **Improved Integration:**
    - Enhances the course archive override for seamless theme compatibility.

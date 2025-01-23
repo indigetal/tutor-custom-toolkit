@@ -39,6 +39,9 @@ class Withdraw_Requests_Handler {
      * Display a notice for the Withdraw Requests page.
      */
     public static function add_withdraw_requests_notice() {
+        if ( current_user_can( 'manage_tutor' ) ) {
+            return; // Skip the notice for administrators.
+        }
         echo '<div class="notice notice-info"><p>' . esc_html__( 'Displaying only your associated withdraw requests.', 'tutor' ) . '</p></div>';
     }
 
@@ -49,7 +52,11 @@ class Withdraw_Requests_Handler {
      * @return array The modified query arguments.
      */
     public static function filter_withdraw_requests_query( $query_args ) {
-        if ( current_user_can( 'view_withdraw_requests' ) && ! current_user_can( 'manage_tutor' ) ) {
+        if ( current_user_can( 'manage_tutor' ) ) {
+            return $query_args; // Skip filtering for administrators.
+        }
+
+        if ( current_user_can( 'view_withdraw_requests' ) ) {
             $query_args['meta_query'] = [
                 [
                     'key'     => 'instructor_id',
