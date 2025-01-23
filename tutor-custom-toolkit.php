@@ -2,13 +2,19 @@
 /*
 Plugin Name: Tutor LMS Advanced Customization Toolkit
 Description: A powerful integration tool for Tutor LMS, making it compatible with Blocksy's Content Blocks and advanced query systems like GreenShift. Features include dynamic template overrides, course metadata storage, and seamless Gutenberg-based customization.
-Version: 1.1.1
+Version: 1.1.2
 Author: Brandon Meyer
 */
 
 // Load dependencies.
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-template-loader.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-metadata-handler.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/class-capabilities-manager.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/class-menu-handler.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/class-data-filtering.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/class-withdraw-requests-handler.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/class-orders-handler.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/class-subscriptions-handler.php';
 
 // Override the course archive template loader.
 add_action( 'tutor_loaded', 'override_tutor_lms_template_loader', 20 );
@@ -37,6 +43,16 @@ function override_tutor_lms_template_loader() {
 // Initialize metadata handler after Tutor LMS is fully loaded.
 add_action( 'tutor_loaded', function() {
     Tutor_LMS_Metadata_Handler::init();
+});
+
+// Initialize custom admin handlers and logic.
+add_action( 'plugins_loaded', function() {
+    Capabilities_Manager::init();
+    Menu_Handler::init();
+    Data_Filtering::init();
+    Withdraw_Requests_Handler::init();
+    Orders_Handler::init();
+    Subscriptions_Handler::init();
 });
 
 // Force WordPress default behavior for the course archive template.

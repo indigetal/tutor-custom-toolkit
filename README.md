@@ -1,32 +1,30 @@
 ## Tutor LMS Advanced Customization Toolkit
 
-A powerful integration tool for Tutor LMS that extends its functionality by enabling advanced template overrides, metadata storage, and seamless customization with WordPress-native tools. Designed with flexibility in mind, this toolkit is perfect for developers and site owners who want to leverage themes like **Blocksy** and advanced Gutenberg-based customization frameworks.
+A powerful integration tool for Tutor LMS that extends its functionality by enabling advanced template overrides, metadata storage, role-based access controls, and dynamic data filtering for backend pages. Designed with flexibility in mind, this toolkit is perfect for developers and site owners who want to enhance Tutor LMS functionality.
 
 ---
 
 ### **Key Features**
 
-1. **Dynamic Template Override:**
+1. **Granular Access Controls:**
 
-   - Overrides the Tutor LMS custom template loader, specifically for the course archive page, to restore WordPress's default template hierarchy.
-   - Allows themes like Blocksy to fully integrate with Tutor LMS templates, unlocking dynamic content design capabilities.
+   - Introduces new capabilities like `view_withdraw_requests`, `manage_orders`, and `view_subscriptions`.
+   - Allows fine-grained control over access to backend pages for roles such as administrators and instructors.
 
-2. **Course Metadata Management:**
+2. **Dynamic Data Filtering:**
+
+   - Filters data displayed on backend pages like Withdraw Requests, Orders, and Subscriptions to ensure instructors only see their associated data.
+
+3. **Dynamic Template Override:**
+
+   - Overrides the Tutor LMS custom template loader for the course archive page, restoring WordPress's default template hierarchy.
+
+4. **Course Metadata Management:**
 
    - Automatically updates course metadata (e.g., average rating, rating count) when courses are saved or reviews are updated.
-   - Leverages Tutor LMS’s built-in functionality to ensure metadata accuracy and consistency.
 
-3. **Integration with Blocksy Content Blocks:**
-
+5. **Integration with Blocksy Content Blocks:**
    - Enables visual customization for the course archive page using Blocksy’s Content Blocks and the Gutenberg editor.
-
-4. **Modular Design:**
-
-   - Structured for selective template overrides, ensuring stability and compatibility with Tutor LMS updates.
-   - Supports extending functionality to additional Tutor LMS templates and settings.
-
-5. **Comment-Based Metadata Updates:**
-   - Automatically updates metadata when reviews are approved or their status changes, ensuring course ratings reflect the latest feedback.
 
 ---
 
@@ -35,37 +33,30 @@ A powerful integration tool for Tutor LMS that extends its functionality by enab
 This plugin is ideal if:
 
 1. You’re using a theme like **Blocksy** or similar advanced frameworks with dynamic content design capabilities.
-2. You want to design Tutor LMS templates directly within the WordPress admin interface, using tools like Gutenberg or Blocksy’s Content Blocks.
+2. You want fine-grained access control and data filtering for Tutor LMS backend pages.
 3. You need to extend Tutor LMS functionality with metadata management or additional dynamic template overrides.
 
 ---
 
-### **New in Version 1.1.1**
+### **New in Version 1.1.2**
 
-1. **Course Metadata Storage:**
+1. **Granular Access Controls:**
 
-   - Adds and updates metadata fields (`tutor_course_rating_count` and `tutor_course_average_rating`) for courses dynamically.
-   - Ensures seamless metadata recalculations during course save or review updates.
+   - Adds role-based capabilities for Withdraw Requests, Orders, and Subscriptions pages.
 
-2. **Improved Template Override:**
-   - Restores full compatibility with WordPress’s default template hierarchy for the course archive page.
-   - Dynamically loads `archive-course.php` if available, falling back to `archive.php` as needed.
+2. **Dynamic Data Filtering:**
+
+   - Ensures that instructors only see data relevant to them on backend pages.
+
+3. **Improved Integration:**
+   - Enhances the course archive override for seamless theme compatibility.
 
 ---
 
 ### **Notes**
 
-- This plugin **targets specific templates** for override, ensuring compatibility and minimizing conflicts with Tutor LMS’s default behavior.
-- Metadata updates are seamlessly integrated with Tutor LMS’s built-in review and course structures.
-- Future updates will include extendable functionality for additional Tutor LMS backend pages like Orders, Students, and Reports.
-
----
-
-### **Planned Features**
-
-1. Granular access controls for backend pages such as Orders, Withdraw Requests, and Reports.
-2. Role-based filtering for dynamic data visibility (e.g., ensuring instructors only see their associated data).
-3. Extendable metadata storage for custom fields and additional data types.
+- This plugin **targets specific templates and backend pages** for override and filtering, ensuring compatibility and minimizing conflicts with Tutor LMS’s default behavior.
+- Metadata updates and access controls are seamlessly integrated with Tutor LMS’s built-in functionality.
 
 ---
 
@@ -73,7 +64,6 @@ This plugin is ideal if:
 
 - WordPress 5.8 or higher.
 - Tutor LMS (latest version recommended).
-- Compatible with themes like Blocksy and GreenShift for advanced design integration.
 
 ---
 
@@ -81,7 +71,7 @@ This plugin is ideal if:
 
 1. Upload the plugin folder to your `/wp-content/plugins/` directory.
 2. Activate the plugin through the Plugins menu in WordPress.
-3. The plugin will automatically initialize its custom template loader and metadata management functionality.
+3. The plugin will automatically initialize its custom functionality, including template overrides, metadata management, and backend page filtering.
 
 ---
 
