@@ -25,7 +25,7 @@ class Data_Filtering {
         switch ($screen->id) {
             case 'tutor_withdraw_requests':
                 error_log('Withdraw Requests screen detected');
-                self::filter_withdraw_requests();
+                self::override_withdraw_controller();
                 break;
             case 'tutor_enrollment':
                 error_log('Enrollment screen detected');
@@ -33,7 +33,7 @@ class Data_Filtering {
                 break;
             case 'tutor_gradebook':
                 error_log('Gradebook screen detected');
-                self::filter_gradebook();
+                self::override_gradebook_controller();
                 break;
             case 'tutor_reports':
                 error_log('Reports screen detected');
@@ -64,65 +64,23 @@ class Data_Filtering {
     }
 
     /**
-     * Filter Withdraw Requests.
+     * Override the WithdrawController.
      */
-    public static function filter_withdraw_requests() {
-        $current_user_id = get_current_user_id();
-
-        // Use utility function to validate instructor role
-        if (!tutor_utils()->has_user_role('instructor', $current_user_id)) {
-            error_log('User is not an instructor for Withdraw Requests');
-            return;
-        }
-
-        // Modify the Withdraw Requests query
-        add_filter('tutor_withdraw_requests_query', function($query) use ($current_user_id) {
-            error_log('Withdraw Requests query filter triggered');
-            error_log(print_r($query, true));
-
-            if (!isset($query['course_id']) || !tutor_utils()->is_instructor_of_this_course($current_user_id, $query['course_id'])) {
-                error_log('User is not the instructor of this course in Withdraw Requests');
-                return $query; // Skip if not the instructor of the course
-            }
-
-            $query['meta_query'][] = [
-                'key' => 'instructor_id',
-                'value' => $current_user_id,
-                'compare' => '=',
-            ];
-            return $query;
-        });
+    public static function override_withdraw_controller() {
+        require_once plugin_dir_path(__FILE__) . 'controllers/WithdrawController.php';
+        new \Custom_Tutor_Controllers\WithdrawController();
+        error_log('Custom WithdrawController initialized.');
     }
 
     /**
-     * Filter Gradebook.
+     * Override the GradebookController.
      */
-    public static function filter_gradebook() {
-        $current_user_id = get_current_user_id();
-
-        // Use utility function to validate instructor role
-        if (!tutor_utils()->has_user_role('instructor', $current_user_id)) {
-            error_log('User is not an instructor for Gradebook');
-            return;
-        }
-
-        add_filter('tutor_gradebook_query', function($query) use ($current_user_id) {
-            error_log('Gradebook query filter triggered');
-            error_log(print_r($query, true));
-
-            if (!isset($query['course_id']) || !tutor_utils()->is_instructor_of_this_course($current_user_id, $query['course_id'])) {
-                error_log('User is not the instructor of this course in Gradebook');
-                return $query; // Skip if not the instructor of the course
-            }
-
-            $query['meta_query'][] = [
-                'key' => '_tutor_instructor_course_id',
-                'value' => $current_user_id,
-                'compare' => '=',
-            ];
-            return $query;
-        });
+    public static function override_gradebook_controller() {
+        require_once plugin_dir_path(__FILE__) . 'controllers/GradebookController.php';
+        new \Custom_Tutor_Controllers\GradebookController();
+        error_log('Custom GradebookController initialized.');
     }
+
 }
 
 // Initialize data filtering.

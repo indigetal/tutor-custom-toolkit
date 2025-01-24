@@ -17,11 +17,13 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-metadata-handler.php'
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-data-filtering.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/EnrollmentController.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/ReportsController.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/WithdrawController.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/GradebookController.php';
 
 // Override the course archive template loader.
 add_action( 'tutor_loaded', 'override_tutor_lms_template_loader', 20 );
 function override_tutor_lms_template_loader() {
-    if ( class_exists( 'TUTOR\\Template' ) ) {
+    if ( class_exists( 'TUTOR\Template' ) ) {
         $template_class = new TUTOR\Template();
         remove_filter( 'template_include', array( $template_class, 'load_course_archive_template' ), 99 );
         Custom_Tutor_LMS_Template_Loader::init();
@@ -46,8 +48,10 @@ add_filter( 'template_include', function( $template ) {
     return $template;
 }, 100 );
 
-// Initialize custom controllers for Enrollment and Reports.
+// Initialize custom controllers for Enrollment, Reports, Withdraw, and Gradebook.
 add_action( 'tutor_loaded', function() {
     new \Custom_Tutor_Controllers\EnrollmentController();
     new \Custom_Tutor_Controllers\ReportsController();
+    new \Custom_Tutor_Controllers\WithdrawController();
+    new \Custom_Tutor_Controllers\GradebookController();
 });
