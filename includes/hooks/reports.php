@@ -8,40 +8,45 @@ if (!defined('ABSPATH')) {
  * Custom hooks for filtering and processing reports in Tutor LMS
  */
 
+// Include shared utility functions
+require_once plugin_dir_path(__FILE__) . '/../utils.php';
+
 /**
- * Filter reports to restrict data to the instructor's courses.
+ * Filter reports data to restrict results based on the instructor's courses.
  */
-add_filter('tutor_reports_data', function ($reports_data) {
+add_filter('tutor_reports_data', function ($reports_data, $course_id = null, $date = null) {
+    global $wpdb;
     $current_user_id = get_current_user_id();
+
+    // Exempt admins from filtering
+    if (user_can($current_user_id, 'administrator')) {
+        return $reports_data;
+    }
 
     // Check if the current user is an instructor
     if (tutor_utils()->has_user_role('instructor', $current_user_id)) {
         $instructor_course_ids = get_courses_by_instructor($current_user_id);
 
-        // Filter reports to include only data for the instructor's courses
-        $filtered_reports = array_filter($reports_data, function ($report) use ($instructor_course_ids) {
-            return in_array($report['course_id'], $instructor_course_ids);
-        });
+        if (!empty($instructor_course_ids)) {
+            // Build the SQL query to fetch filtered reports
+            $placeholders = implode(',', array_fill(0, count($instructor_course_ids), '%d'));
+            $sql = "SELECT * FROM {$wpdb->prefix}tutor_course_reports WHERE course_id IN ($placeholders)";
 
-        return $filtered_reports;
+            // Add date filtering if provided
+            if (!empty($date) && isset($date['start'], $date['end'])) {
+                $sql .= " AND created_at BETWEEN %s AND %s";
+                $query_args = array_merge($instructor_course_ids, [$date['start'], $date['end']]);
+            } else {
+                $query_args = $instructor_course_ids;
+            }
+
+            $prepared_sql = $wpdb->prepare($sql, $query_args);
+            return $wpdb->get_results($prepared_sql, ARRAY_A);
+        } else {
+            return []; // No courses for this instructor
+        }
     }
 
-    return $reports_data; // Return unfiltered data for non-instructors
-});
-
-/**
- * Helper function to get all course IDs created by an instructor.
- *
- * @param int $instructor_id The ID of the instructor.
- * @return array An array of course IDs.
- */
-function get_courses_by_instructor($instructor_id) {
-    $query = new WP_Query([
-        'post_type'      => 'tutor_course',
-        'posts_per_page' => -1,
-        'author'         => $instructor_id,
-        'fields'         => 'ids',
-    ]);
-
-    return $query->posts;
-}
+    // Default behavior for non-instructors
+    return $reports_data;
+}, 10, 3);

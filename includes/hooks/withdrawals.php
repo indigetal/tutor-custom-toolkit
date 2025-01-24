@@ -8,11 +8,19 @@ if (!defined('ABSPATH')) {
  * Custom hooks for filtering and processing withdrawal requests in Tutor LMS
  */
 
+// Include shared utility functions
+require_once plugin_dir_path(__FILE__) . '/../utils.php';
+
 /**
- * Filter withdrawal requests to restrict data to the instructor's courses.
+ * Filter withdrawal requests query to restrict data to the instructor's courses.
  */
-add_filter('tutor_withdrawal_requests_query', function ($query_args) {
+add_filter('tutor_withdrawal_requests_query_args', function ($query_args) {
     $current_user_id = get_current_user_id();
+
+    // Exempt admins from filtering
+    if (user_can($current_user_id, 'administrator')) {
+        return $query_args;
+    }
 
     // Check if the current user is an instructor
     if (tutor_utils()->has_user_role('instructor', $current_user_id)) {
@@ -36,20 +44,3 @@ add_filter('tutor_withdrawal_requests_query', function ($query_args) {
 
     return $query_args;
 });
-
-/**
- * Helper function to get all course IDs created by an instructor.
- *
- * @param int $instructor_id The ID of the instructor.
- * @return array An array of course IDs.
- */
-function get_courses_by_instructor($instructor_id) {
-    $query = new WP_Query([
-        'post_type'      => 'tutor_course',
-        'posts_per_page' => -1,
-        'author'         => $instructor_id,
-        'fields'         => 'ids',
-    ]);
-
-    return $query->posts;
-}

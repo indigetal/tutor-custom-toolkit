@@ -8,49 +8,32 @@ if (!defined('ABSPATH')) {
  * Custom hooks for filtering and processing enrollments in Tutor LMS
  */
 
+// Include shared utility functions
+require_once plugin_dir_path(__FILE__) . '/../utils.php';
+
 /**
- * Filter enrollments to restrict data to the instructor's courses.
+ * Filter enrolled courses query to restrict data to the instructor's courses.
  */
-add_filter('tutor_enrollment_query', function ($query_args) {
+add_filter('tutor_dashboard_enrolled_courses_query', function ($query_args) {
     $current_user_id = get_current_user_id();
+
+    // Exempt admins from filtering
+    if (user_can($current_user_id, 'administrator')) {
+        return $query_args;
+    }
 
     // Check if the current user is an instructor
     if (tutor_utils()->has_user_role('instructor', $current_user_id)) {
-        // Get instructor's course IDs
+        // Get instructor's course IDs (including authored and co-authored)
         $instructor_course_ids = get_courses_by_instructor($current_user_id);
 
         if (!empty($instructor_course_ids)) {
-            $query_args['meta_query'][] = [
-                'key'     => 'course_id',
-                'value'   => $instructor_course_ids,
-                'compare' => 'IN',
-            ];
+            $query_args['post__in'] = $instructor_course_ids;
         } else {
             // Prevent showing enrollments if the instructor has no courses
-            $query_args['meta_query'][] = [
-                'key'     => 'course_id',
-                'value'   => -1, // No matching courses
-                'compare' => '=',
-            ];
+            $query_args['post__in'] = [-1]; // No matching courses
         }
     }
 
     return $query_args;
 });
-
-/**
- * Helper function to get all course IDs created by an instructor.
- *
- * @param int $instructor_id The ID of the instructor.
- * @return array An array of course IDs.
- */
-function get_courses_by_instructor($instructor_id) {
-    $query = new WP_Query([
-        'post_type'      => 'tutor_course',
-        'posts_per_page' => -1,
-        'author'         => $instructor_id,
-        'fields'         => 'ids',
-    ]);
-
-    return $query->posts;
-}

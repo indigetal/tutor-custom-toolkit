@@ -8,40 +8,45 @@ if (!defined('ABSPATH')) {
  * Custom hooks for filtering and processing gradebook data in Tutor LMS
  */
 
+// Include shared utility functions
+require_once plugin_dir_path(__FILE__) . '/../utils.php';
+
 /**
  * Filter gradebook data to restrict entries to the instructor's courses.
  */
-add_filter('tutor_gradebook_data', function ($gradebook_data) {
+add_filter('tutor_gradebook_data', function ($gradebook_data, $course_id = null) {
+    global $wpdb;
     $current_user_id = get_current_user_id();
+
+    // Exempt admins from filtering
+    if (user_can($current_user_id, 'administrator')) {
+        return $gradebook_data;
+    }
 
     // Check if the current user is an instructor
     if (tutor_utils()->has_user_role('instructor', $current_user_id)) {
         $instructor_course_ids = get_courses_by_instructor($current_user_id);
 
-        // Filter gradebook entries to include only data for the instructor's courses
-        $filtered_gradebook = array_filter($gradebook_data, function ($entry) use ($instructor_course_ids) {
-            return in_array($entry['course_id'], $instructor_course_ids);
-        });
+        if (!empty($instructor_course_ids)) {
+            // Build the SQL query to fetch filtered gradebook entries
+            $placeholders = implode(',', array_fill(0, count($instructor_course_ids), '%d'));
+            $sql = "SELECT * FROM {$wpdb->prefix}tutor_gradebook WHERE course_id IN ($placeholders)";
 
-        return $filtered_gradebook;
+            // Add course-specific filtering if a course_id is provided
+            if ($course_id && in_array($course_id, $instructor_course_ids)) {
+                $sql .= " AND course_id = %d";
+                $query_args = array_merge($instructor_course_ids, [$course_id]);
+            } else {
+                $query_args = $instructor_course_ids;
+            }
+
+            $prepared_sql = $wpdb->prepare($sql, $query_args);
+            return $wpdb->get_results($prepared_sql, ARRAY_A);
+        } else {
+            return []; // No courses for this instructor
+        }
     }
 
-    return $gradebook_data; // Return unfiltered data for non-instructors
-});
-
-/**
- * Helper function to get all course IDs created by an instructor.
- *
- * @param int $instructor_id The ID of the instructor.
- * @return array An array of course IDs.
- */
-function get_courses_by_instructor($instructor_id) {
-    $query = new WP_Query([
-        'post_type'      => 'tutor_course',
-        'posts_per_page' => -1,
-        'author'         => $instructor_id,
-        'fields'         => 'ids',
-    ]);
-
-    return $query->posts;
-}
+    // Default behavior for non-instructors
+    return $gradebook_data;
+}, 10, 2);

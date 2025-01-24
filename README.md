@@ -6,9 +6,9 @@ A powerful integration tool for Tutor LMS that extends its functionality by enab
 
 ### **Key Features**
 
-1. **Dynamic Data Filtering:**
+1. **Hook-Based Data Filtering:**
 
-   - Filters data displayed on backend pages to ensure instructors only see data related to their own courses:
+   - Uses Tutor LMS’s hooks and filters to ensure instructors only see data related to their own courses:
      - **Withdraw Requests:** Displays only withdraw requests from students in the instructor’s courses.
      - **Enrollment:** Shows only enrollments for the instructor’s courses.
      - **Gradebook:** Lists only gradebook data tied to the instructor’s courses.
@@ -37,18 +37,23 @@ This plugin is ideal if:
 
 ---
 
-### **New in Version 1.2.1**
+### **New in Version 1.2.2**
 
-1. **Dynamic Data Filtering:**
+1. **Hook-Based Data Filtering:**
 
-   - Ensures that instructors only see data related to their own courses on backend pages such as Withdraw Requests, Enrollment, Gradebook, and Reports.
+   - Refactored to use Tutor LMS’s built-in hooks and filters for data retrieval on backend pages such as Withdraw Requests, Enrollment, Gradebook, and Reports.
+   - Improved compatibility with Tutor LMS updates by removing reliance on custom controllers.
 
-2. **Improved Integration:**
+2. **Centralized Utility Functions:**
 
-   - Enhances the course archive override for seamless theme compatibility.
+   - Introduced a shared `utils.php` file for reusable utility functions, improving maintainability.
 
-3. **Streamlined Approach:**
-   - Refactored to leverage Tutor LMS’s existing `manage_tutor` capability, simplifying access control.
+3. **Improved Organization:**
+
+   - Reorganized codebase to separate hook logic into dedicated files for better readability and modularity.
+
+4. **Enhanced Performance:**
+   - Streamlined the data filtering process by leveraging WordPress’s native query mechanisms through Tutor LMS hooks.
 
 ---
 
