@@ -1,9 +1,5 @@
 <?php
-/**
- * Implements dynamic data filtering for Tutor LMS backend pages based on user roles.
- */
-
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 class Data_Filtering {
 
@@ -11,97 +7,102 @@ class Data_Filtering {
      * Initialize data filtering hooks.
      */
     public static function init() {
-        add_action( 'pre_get_posts', [ __CLASS__, 'filter_withdraw_requests' ] );
-        add_action( 'pre_get_posts', [ __CLASS__, 'filter_enrollment' ] );
-        add_action( 'pre_get_posts', [ __CLASS__, 'filter_gradebook' ] );
-        add_action( 'pre_get_posts', [ __CLASS__, 'filter_reports' ] );
+        add_action('admin_menu', [__CLASS__, 'apply_custom_filters']);
     }
 
     /**
-     * Filter Withdraw Requests data for instructors.
-     *
-     * @param WP_Query $query The current query object.
+     * Apply filters to specific backend pages.
      */
-    public static function filter_withdraw_requests( $query ) {
-        if ( is_admin() && $query->is_main_query() && isset( $_GET['page'] ) && $_GET['page'] === 'tutor_withdraw_requests' ) {
-            if ( current_user_can( 'manage_tutor' ) ) {
-                return; // Skip filtering for administrators.
-            }
+    public static function apply_custom_filters() {
+        $screen = get_current_screen();
+        if (!$screen || !current_user_can('manage_tutor')) {
+            return;
+        }
 
-            if ( current_user_can( 'manage_tutor' ) ) {
-                $query->set( 'meta_key', 'instructor_id' );
-                $query->set( 'meta_value', get_current_user_id() );
-            }
+        // Check for specific backend screens and apply filtering logic
+        switch ($screen->id) {
+            case 'tutor_withdraw_requests':
+                self::filter_withdraw_requests();
+                break;
+            case 'tutor_enrollment':
+                self::filter_enrollment();
+                break;
+            case 'tutor_gradebook':
+                self::filter_gradebook();
+                break;
+            case 'tutor_reports':
+                self::filter_reports();
+                break;
         }
     }
 
     /**
-     * Filter Enrollment data for instructors.
-     *
-     * @param WP_Query $query The current query object.
+     * Filter Withdraw Requests.
      */
-    public static function filter_enrollment( $query ) {
-        if ( is_admin() && $query->is_main_query() && isset( $_GET['page'] ) && $_GET['page'] === 'tutor_enrollment' ) {
-            if ( current_user_can( 'manage_tutor' ) ) {
-                return; // Skip filtering for administrators.
-            }
+    public static function filter_withdraw_requests() {
+        global $wpdb;
+        $current_user_id = get_current_user_id();
 
-            if ( current_user_can( 'manage_tutor' ) ) {
-                $query->set( 'meta_query', [
-                    [
-                        'key'     => 'course_author',
-                        'value'   => get_current_user_id(),
-                        'compare' => '=',
-                    ],
-                ] );
+        // Modify the Withdraw Requests query
+        add_filter('tutor_withdraw_requests_query', function($query) use ($current_user_id) {
+            if (!current_user_can('administrator')) {
+                $query['meta_query'][] = [
+                    'key' => 'instructor_id',
+                    'value' => $current_user_id,
+                    'compare' => '=',
+                ];
             }
-        }
+            return $query;
+        });
     }
 
     /**
-     * Filter Gradebook data for instructors.
-     *
-     * @param WP_Query $query The current query object.
+     * Filter Enrollment.
      */
-    public static function filter_gradebook( $query ) {
-        if ( is_admin() && $query->is_main_query() && isset( $_GET['page'] ) && $_GET['page'] === 'tutor_gradebook' ) {
-            if ( current_user_can( 'manage_tutor' ) ) {
-                return; // Skip filtering for administrators.
-            }
+    public static function filter_enrollment() {
+        global $wpdb;
+        $current_user_id = get_current_user_id();
 
-            if ( current_user_can( 'manage_tutor' ) ) {
-                $query->set( 'meta_query', [
-                    [
-                        'key'     => 'course_author',
-                        'value'   => get_current_user_id(),
-                        'compare' => '=',
-                    ],
-                ] );
+        add_filter('tutor_enrollment_query', function($query) use ($current_user_id) {
+            if (!current_user_can('administrator')) {
+                $query['author'] = $current_user_id;
             }
-        }
+            return $query;
+        });
     }
 
     /**
-     * Filter Reports data for instructors.
-     *
-     * @param WP_Query $query The current query object.
+     * Filter Gradebook.
      */
-    public static function filter_reports( $query ) {
-        if ( is_admin() && $query->is_main_query() && isset( $_GET['page'] ) && $_GET['page'] === 'tutor_reports' ) {
-            if ( current_user_can( 'manage_tutor' ) ) {
-                return; // Skip filtering for administrators.
-            }
+    public static function filter_gradebook() {
+        global $wpdb;
+        $current_user_id = get_current_user_id();
 
-            if ( current_user_can( 'manage_tutor' ) ) {
-                $query->set( 'meta_query', [
-                    [
-                        'key'     => 'course_author',
-                        'value'   => get_current_user_id(),
-                        'compare' => '=',
-                    ],
-                ] );
+        add_filter('tutor_gradebook_query', function($query) use ($current_user_id) {
+            if (!current_user_can('administrator')) {
+                $query['meta_query'][] = [
+                    'key' => '_tutor_instructor_course_id',
+                    'value' => $current_user_id,
+                    'compare' => '=',
+                ];
             }
-        }
+            return $query;
+        });
+    }
+
+    /**
+     * Filter Reports.
+     */
+    public static function filter_reports() {
+        global $wpdb;
+        $current_user_id = get_current_user_id();
+
+        add_filter('tutor_reports_query', function($query) use ($current_user_id) {
+            if (!current_user_can('administrator')) {
+                $query['author'] = $current_user_id;
+            }
+            return $query;
+        });
     }
 }
 

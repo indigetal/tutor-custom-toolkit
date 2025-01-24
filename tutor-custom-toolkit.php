@@ -2,7 +2,7 @@
 /*
 Plugin Name: Tutor LMS Advanced Customization Toolkit
 Description: A powerful integration tool for Tutor LMS, making it compatible with Blocksy's Content Blocks and advanced query systems like GreenShift. Features include dynamic template overrides, course metadata storage, and seamless Gutenberg-based customization.
-Version: 1.2.1
+Version: 1.2.3
 Author: Brandon Meyer
 */
 
