@@ -1,7 +1,7 @@
 <?php
 namespace Custom_Tutor_Controllers;
 
-use TUTOR\Http\Controllers\GradebookController as BaseGradebookController;
+use Tutor\Http\Controllers\GradebookController as BaseGradebookController;
 use WP_Query;
 
 class GradebookController extends BaseGradebookController {
@@ -10,6 +10,12 @@ class GradebookController extends BaseGradebookController {
      * Override the index method to filter gradebook data by instructor.
      */
     public function index() {
+        // Ensure the base class exists
+        if (!class_exists('Tutor\Http\Controllers\GradebookController')) {
+            error_log('Base GradebookController class not found!');
+            wp_die(__('Base GradebookController class not found.', 'tutor'));
+        }
+
         $current_user_id = get_current_user_id();
 
         // Ensure the current user is an instructor

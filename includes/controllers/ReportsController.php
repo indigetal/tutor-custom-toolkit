@@ -1,7 +1,7 @@
 <?php
 namespace Custom_Tutor_Controllers;
 
-use TUTOR\Http\Controllers\ReportsController as BaseReportsController;
+use Tutor\Http\Controllers\ReportsController as BaseReportsController;
 use WP_Query;
 
 class ReportsController extends BaseReportsController {
@@ -10,6 +10,12 @@ class ReportsController extends BaseReportsController {
      * Override the index method to filter reports by instructor.
      */
     public function index() {
+        // Ensure the base class exists
+        if (!class_exists('Tutor\Http\Controllers\ReportsController')) {
+            error_log('Base ReportsController class not found!');
+            wp_die(__('Base ReportsController class not found.', 'tutor'));
+        }
+
         $current_user_id = get_current_user_id();
 
         // Ensure the current user is an instructor

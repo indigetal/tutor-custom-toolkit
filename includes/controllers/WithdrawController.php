@@ -1,7 +1,7 @@
 <?php
 namespace Custom_Tutor_Controllers;
 
-use TUTOR\Http\Controllers\WithdrawController as BaseWithdrawController;
+use Tutor\Http\Controllers\WithdrawController as BaseWithdrawController;
 use WP_Query;
 
 class WithdrawController extends BaseWithdrawController {
@@ -10,6 +10,12 @@ class WithdrawController extends BaseWithdrawController {
      * Override the index method to filter withdraw requests by instructor.
      */
     public function index() {
+        // Ensure the base class exists
+        if (!class_exists('Tutor\Http\Controllers\WithdrawController')) {
+            error_log('Base WithdrawController class not found!');
+            wp_die(__('Base WithdrawController class not found.', 'tutor'));
+        }
+
         $current_user_id = get_current_user_id();
 
         // Ensure the current user is an instructor

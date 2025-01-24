@@ -15,10 +15,6 @@ if ( ! defined( 'TUTOR_CUSTOM_TOOLKIT_FILE' ) ) {
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-template-loader.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-metadata-handler.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-data-filtering.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/EnrollmentController.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/ReportsController.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/WithdrawController.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/GradebookController.php';
 
 // Override the course archive template loader.
 add_action( 'tutor_loaded', 'override_tutor_lms_template_loader', 20 );
@@ -50,8 +46,31 @@ add_filter( 'template_include', function( $template ) {
 
 // Initialize custom controllers for Enrollment, Reports, Withdraw, and Gradebook.
 add_action( 'tutor_loaded', function() {
-    new \Custom_Tutor_Controllers\EnrollmentController();
-    new \Custom_Tutor_Controllers\ReportsController();
-    new \Custom_Tutor_Controllers\WithdrawController();
-    new \Custom_Tutor_Controllers\GradebookController();
+    if ( class_exists( 'Tutor\Http\Controllers\EnrollmentController' ) ) {
+        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/EnrollmentController.php';
+        new \Custom_Tutor_Controllers\EnrollmentController();
+    } else {
+        error_log('Base EnrollmentController class not found');
+    }
+
+    if ( class_exists( 'Tutor\Http\Controllers\ReportsController' ) ) {
+        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/ReportsController.php';
+        new \Custom_Tutor_Controllers\ReportsController();
+    } else {
+        error_log('Base ReportsController class not found');
+    }
+
+    if ( class_exists( 'Tutor\Http\Controllers\WithdrawController' ) ) {
+        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/WithdrawController.php';
+        new \Custom_Tutor_Controllers\WithdrawController();
+    } else {
+        error_log('Base WithdrawController class not found');
+    }
+
+    if ( class_exists( 'Tutor\Http\Controllers\GradebookController' ) ) {
+        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/GradebookController.php';
+        new \Custom_Tutor_Controllers\GradebookController();
+    } else {
+        error_log('Base GradebookController class not found');
+    }
 });

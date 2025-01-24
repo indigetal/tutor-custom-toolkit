@@ -1,7 +1,7 @@
 <?php
 namespace Custom_Tutor_Controllers;
 
-use TUTOR\Http\Controllers\EnrollmentController as BaseEnrollmentController;
+use Tutor\Http\Controllers\EnrollmentController as BaseEnrollmentController;
 use WP_Query;
 
 class EnrollmentController extends BaseEnrollmentController {
@@ -10,6 +10,12 @@ class EnrollmentController extends BaseEnrollmentController {
      * Override the index method to filter enrollments by instructor.
      */
     public function index() {
+        // Ensure the base class exists
+        if (!class_exists('Tutor\Http\Controllers\EnrollmentController')) {
+            error_log('Base EnrollmentController class not found!');
+            wp_die(__('Base EnrollmentController class not found.', 'tutor'));
+        }
+
         $current_user_id = get_current_user_id();
 
         // Ensure the current user is an instructor
