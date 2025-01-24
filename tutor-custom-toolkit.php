@@ -2,7 +2,7 @@
 /*
 Plugin Name: Tutor LMS Advanced Customization Toolkit
 Description: A powerful integration tool for Tutor LMS, making it compatible with Blocksy's Content Blocks and advanced query systems like GreenShift. Features include dynamic template overrides, course metadata storage, and seamless Gutenberg-based customization.
-Version: 1.2.4
+Version: 0.4.0
 Author: Brandon Meyer
 */
 
@@ -14,7 +14,14 @@ if ( ! defined( 'TUTOR_CUSTOM_TOOLKIT_FILE' ) ) {
 // Load dependencies.
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-template-loader.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-metadata-handler.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-data-filtering.php';
+
+// Load custom hooks.
+add_action('tutor_loaded', function () {
+    require_once plugin_dir_path(__FILE__) . 'includes/hooks/enrollments.php';
+    require_once plugin_dir_path(__FILE__) . 'includes/hooks/reports.php';
+    require_once plugin_dir_path(__FILE__) . 'includes/hooks/withdrawals.php';
+    require_once plugin_dir_path(__FILE__) . 'includes/hooks/gradebook.php';
+});
 
 // Override the course archive template loader.
 add_action( 'tutor_loaded', 'override_tutor_lms_template_loader', 20 );
@@ -31,11 +38,6 @@ add_action( 'tutor_loaded', function() {
     Tutor_LMS_Metadata_Handler::init();
 });
 
-// Initialize custom data filtering logic.
-add_action( 'plugins_loaded', function() {
-    Data_Filtering::init();
-});
-
 // Force WordPress default behavior for the course archive template.
 add_filter( 'template_include', function( $template ) {
     if ( is_post_type_archive( 'courses' ) ) {
@@ -43,34 +45,3 @@ add_filter( 'template_include', function( $template ) {
     }
     return $template;
 }, 100 );
-
-// Initialize custom controllers for Enrollment, Reports, Withdraw, and Gradebook.
-add_action( 'tutor_loaded', function() {
-    if ( class_exists( 'Tutor\Http\Controllers\EnrollmentController' ) ) {
-        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/EnrollmentController.php';
-        new \Custom_Tutor_Controllers\EnrollmentController();
-    } else {
-        error_log('Base EnrollmentController class not found');
-    }
-
-    if ( class_exists( 'Tutor\Http\Controllers\ReportsController' ) ) {
-        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/ReportsController.php';
-        new \Custom_Tutor_Controllers\ReportsController();
-    } else {
-        error_log('Base ReportsController class not found');
-    }
-
-    if ( class_exists( 'Tutor\Http\Controllers\WithdrawController' ) ) {
-        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/WithdrawController.php';
-        new \Custom_Tutor_Controllers\WithdrawController();
-    } else {
-        error_log('Base WithdrawController class not found');
-    }
-
-    if ( class_exists( 'Tutor\Http\Controllers\GradebookController' ) ) {
-        require_once plugin_dir_path( __FILE__ ) . 'includes/controllers/GradebookController.php';
-        new \Custom_Tutor_Controllers\GradebookController();
-    } else {
-        error_log('Base GradebookController class not found');
-    }
-});
