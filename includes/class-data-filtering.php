@@ -40,18 +40,24 @@ class Data_Filtering {
      * Filter Withdraw Requests.
      */
     public static function filter_withdraw_requests() {
-        global $wpdb;
         $current_user_id = get_current_user_id();
+
+        // Use utility function to validate instructor role
+        if (!tutor_utils()->has_user_role('instructor', $current_user_id)) {
+            return;
+        }
 
         // Modify the Withdraw Requests query
         add_filter('tutor_withdraw_requests_query', function($query) use ($current_user_id) {
-            if (!current_user_can('administrator')) {
-                $query['meta_query'][] = [
-                    'key' => 'instructor_id',
-                    'value' => $current_user_id,
-                    'compare' => '=',
-                ];
+            if (!tutor_utils()->is_instructor_of_this_course($current_user_id, $query['course_id'] ?? 0)) {
+                return $query; // Skip if not the instructor of the course
             }
+
+            $query['meta_query'][] = [
+                'key' => 'instructor_id',
+                'value' => $current_user_id,
+                'compare' => '=',
+            ];
             return $query;
         });
     }
@@ -60,13 +66,19 @@ class Data_Filtering {
      * Filter Enrollment.
      */
     public static function filter_enrollment() {
-        global $wpdb;
         $current_user_id = get_current_user_id();
 
+        // Use utility function to validate instructor role
+        if (!tutor_utils()->has_user_role('instructor', $current_user_id)) {
+            return;
+        }
+
         add_filter('tutor_enrollment_query', function($query) use ($current_user_id) {
-            if (!current_user_can('administrator')) {
-                $query['author'] = $current_user_id;
+            if (!tutor_utils()->is_instructor_of_this_course($current_user_id, $query['course_id'] ?? 0)) {
+                return $query; // Skip if not the instructor of the course
             }
+
+            $query['author'] = $current_user_id;
             return $query;
         });
     }
@@ -75,17 +87,23 @@ class Data_Filtering {
      * Filter Gradebook.
      */
     public static function filter_gradebook() {
-        global $wpdb;
         $current_user_id = get_current_user_id();
 
+        // Use utility function to validate instructor role
+        if (!tutor_utils()->has_user_role('instructor', $current_user_id)) {
+            return;
+        }
+
         add_filter('tutor_gradebook_query', function($query) use ($current_user_id) {
-            if (!current_user_can('administrator')) {
-                $query['meta_query'][] = [
-                    'key' => '_tutor_instructor_course_id',
-                    'value' => $current_user_id,
-                    'compare' => '=',
-                ];
+            if (!tutor_utils()->is_instructor_of_this_course($current_user_id, $query['course_id'] ?? 0)) {
+                return $query; // Skip if not the instructor of the course
             }
+
+            $query['meta_query'][] = [
+                'key' => '_tutor_instructor_course_id',
+                'value' => $current_user_id,
+                'compare' => '=',
+            ];
             return $query;
         });
     }
@@ -94,13 +112,19 @@ class Data_Filtering {
      * Filter Reports.
      */
     public static function filter_reports() {
-        global $wpdb;
         $current_user_id = get_current_user_id();
 
+        // Use utility function to validate instructor role
+        if (!tutor_utils()->has_user_role('instructor', $current_user_id)) {
+            return;
+        }
+
         add_filter('tutor_reports_query', function($query) use ($current_user_id) {
-            if (!current_user_can('administrator')) {
-                $query['author'] = $current_user_id;
+            if (!tutor_utils()->is_instructor_of_this_course($current_user_id, $query['course_id'] ?? 0)) {
+                return $query; // Skip if not the instructor of the course
             }
+
+            $query['author'] = $current_user_id;
             return $query;
         });
     }
